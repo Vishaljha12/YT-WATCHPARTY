@@ -6,7 +6,7 @@ import { io } from "socket.io-client";
  * Example:
  * https://yt-watchparty-backend.up.railway.app
  */
-const BACKEND_URL = "https://yt-watchparty-vyrb.vercel.app/";
+const BACKEND_URL = "https://yt-watchparty-uqxn.vercel.app/";
 
 /**
  * Socket.IO client instance
