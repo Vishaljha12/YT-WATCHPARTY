@@ -1,0 +1,109 @@
+/* Inherit the dark theme */
+.room-container {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Glass Header */
+.glass-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-left h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.header-left span {
+  color: white;
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+/* User Badge & Button */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.user-badge {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.btn-action {
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(to right, #6366f1, #8b5cf6);
+  border: none;
+  border-radius: 0.5rem;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: hover 0.2s;
+}
+
+.btn-action:hover {
+  filter: brightness(1.1);
+}
+
+/* Main Grid Layout */
+.room-grid {
+  display: grid;
+  grid-template-columns: 3fr 1fr; /* Video takes 3 parts, Chat takes 1 part */
+  gap: 1.5rem;
+  padding: 1.5rem;
+  flex: 1; /* Fills remaining height */
+  height: calc(100vh - 80px); /* Adjust based on header height */
+}
+
+/* Common Glass Panel Style */
+.glass-panel {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Specific styling for Video Box */
+.video-box {
+  padding: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Specific styling for Chat Box */
+.chat-box {
+  /* This ensures the chat component inside fills the height */
+  height: 100%; 
+}
+
+/* Responsive: Stack them on mobile */
+@media (max-width: 900px) {
+  .room-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  
+  .chat-box {
+    height: 500px; /* Fixed height for chat on mobile */
+  }
+}

@@ -1,6 +1,7 @@
 import { io } from "socket.io-client";
 
-const socket = io("https://watch-party-backend.onrender.com");
-
+const socket = io("http://localhost:5000", {
+  autoConnect: false
+});
 
 export default socket;

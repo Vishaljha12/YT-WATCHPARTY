@@ -1,49 +1,75 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import Layout from "../components/Layout";
+import socket from "../socket";
 import VideoPlayer from "../components/VideoPlayer";
 import Chat from "../components/Chat";
-import socket from "../socket";
+import "./Room.css"; // Create this file
 
 export default function Room() {
   const { roomId } = useParams();
   const { state } = useLocation();
-  const username = state?.name;
+  const username = state?.name || "Guest"; // Fallback if direct link used
 
-  const [videoId, setVideoId] = useState("");
   const [isHost, setIsHost] = useState(false);
+  const [videoId, setVideoId] = useState("");
 
   useEffect(() => {
-    socket.emit("join-room", { roomId, username });
+    socket.connect();
 
-    socket.on("room-state", s => {
-      setIsHost(s.hostId === socket.id);
-      if (s.videoId) setVideoId(s.videoId);
+    socket.on("connect", () => {
+      socket.emit("join-room", { roomId, username });
     });
 
-    socket.on("video-changed", id => setVideoId(id));
+    socket.on("room-state", (state) => {
+      setIsHost(state.hostId === socket.id);
+    });
 
-    return () => {
-      socket.off("room-state");
-      socket.off("video-changed");
-    };
-  }, []);
+    socket.on("video-changed", (id) => {
+      setVideoId(id);
+    });
 
-  const setVideo = () => {
+    return () => socket.disconnect();
+  }, [roomId, username]);
+
+  const changeVideo = () => {
     const url = prompt("Paste YouTube URL");
-    const id = url?.split("v=")[1]?.split("&")[0];
-    if (!id) return alert("Invalid URL");
+    if (!url) return;
+    const id = url.split("v=")[1]?.split("&")[0];
+    if (!id) return alert("Invalid YouTube URL");
+
     socket.emit("set-video", { roomId, videoId: id });
   };
 
   return (
-    <Layout>
-      <button onClick={setVideo} disabled={!isHost}>Change Video</button>
+    <div className="room-container">
+      {/* Header Bar */}
+      <header className="glass-header">
+        <div className="header-left">
+          <h1>📺 Room: <span>{roomId}</span></h1>
+        </div>
+        
+        <div className="header-right">
+          <span className="user-badge">👤 {username}</span>
+          {isHost && (
+            <button className="btn-action" onClick={changeVideo}>
+              Change Video 🎬
+            </button>
+          )}
+        </div>
+      </header>
 
-      <div style={{ display: "grid", gridTemplateColumns: "3fr 1fr", gap: 24, marginTop: 20 }}>
-        <VideoPlayer videoId={videoId} roomId={roomId} isHost={isHost} />
-        <Chat roomId={roomId} username={username} />
+      {/* Main Content Grid */}
+      <div className="room-grid">
+        {/* Left: Video Player */}
+        <div className="video-box glass-panel">
+            <VideoPlayer videoId={videoId} />
+        </div>
+
+        {/* Right: Chat */}
+        <div className="chat-box glass-panel">
+          <Chat roomId={roomId} username={username} />
+        </div>
       </div>
-    </Layout>
+    </div>
   );
 }

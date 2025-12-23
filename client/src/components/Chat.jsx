@@ -2,40 +2,50 @@ import { useEffect, useState } from "react";
 import socket from "../socket";
 
 export default function Chat({ roomId, username }) {
-  const [msg, setMsg] = useState("");
-  const [list, setList] = useState([]);
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    socket.on("chat-message", m => setList(p => [...p, m]));
+    socket.on("chat-message", (msg) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+
     return () => socket.off("chat-message");
   }, []);
 
   const send = () => {
-    if (!msg) return;
-    socket.emit("chat-message", { roomId, username, message: msg });
-    setList(p => [...p, { username, message: msg }]);
-    setMsg("");
+    if (!message) return;
+    socket.emit("chat-message", { roomId, username, message });
+    setMessages((prev) => [...prev, { username, message }]);
+    setMessage("");
   };
 
   return (
-    <div style={styles.box}>
-      <div style={styles.messages}>
-        {list.map((m, i) => (
-          <div key={i} style={{ ...styles.msg, alignSelf: m.username === username ? "flex-end" : "flex-start" }}>
-            <small>{m.username}</small>
-            <div>{m.message}</div>
+    <div style={{ marginTop: 20 }}>
+      <h3>Chat</h3>
+
+      <div
+        style={{
+          height: 200,
+          border: "1px solid #444",
+          padding: 10,
+          overflowY: "auto",
+          marginBottom: 10
+        }}
+      >
+        {messages.map((m, i) => (
+          <div key={i}>
+            <b>{m.username}:</b> {m.message}
           </div>
         ))}
       </div>
 
-      <input value={msg} onChange={e => setMsg(e.target.value)} placeholder="Message" />
+      <input
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Type message"
+      />
       <button onClick={send}>Send</button>
     </div>
   );
 }
-
-const styles = {
-  box: { background: "#343435ff", padding: 12, borderRadius: 12 },
-  messages: { display: "flex", flexDirection: "column", height: 260, overflowY: "auto" },
-  msg: { background: "#2a2d3a", padding: 8, borderRadius: 8, marginBottom: 8, maxWidth: "80%" },
-};
